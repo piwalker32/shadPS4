@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include "common/assert.h"
 #include "common/object_pool.h"
 #include "common/types.h"
 
@@ -60,6 +61,8 @@ public:
     [[nodiscard]] Entry& operator[](size_t page) {
         const size_t l1_page = page >> SecondLevelBits;
         const size_t l2_page = page & (NumEntriesPerL1Page - 1);
+        ASSERT_MSG(l1_page < (1ULL << FirstLevelBits),
+                    "Attempted to load out of bounds Page {}", page);
         if (!first_level_map[l1_page]) {
             first_level_map[l1_page] = page_alloc.Create();
         }
